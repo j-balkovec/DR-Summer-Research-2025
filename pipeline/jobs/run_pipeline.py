@@ -4,10 +4,12 @@
 
 # brief: [Driver] runs the main pipeline
 
+# [SINGLE THREAD]
+
 # == sys path ==
 import sys
 from pathlib import Path
-sys.path.append(str(Path(__file__).resolve().parents[1]))
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 # == sys path ==
 
 from pipeline.pipes.load_image import LoadImagePipe
@@ -29,7 +31,7 @@ pipeline = DRPipeline([
     LesionMaskLoadingPipe(),
     PatchExtractionPipe(),
     LabelPatchesPipe(),
-    SavePatchesPipe()
+    SavePatchesPipe(multiprocessing=False)
 ])
 
 _ = pipeline.run(all_data) # assignable

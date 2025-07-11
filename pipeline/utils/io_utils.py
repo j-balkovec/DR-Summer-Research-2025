@@ -69,3 +69,12 @@ def ensure_dir(path: Path):
 
     # note: this is useful for creating directories before saving files
     path.mkdir(parents=True, exist_ok=True)
+
+def tqdm_if_verbose(iterable, desc=None, disable=False, **kwargs):
+    # note: for multiprocessing
+    # pre: iterable is an iterable object
+    # post: returns a tqdm iterator if not disabled, otherwise returns the iterable
+    # desc: adds a progress bar to the iterable if not disabled
+
+    from tqdm import tqdm
+    return tqdm(iterable, desc=desc, **kwargs) if not disable else iterable

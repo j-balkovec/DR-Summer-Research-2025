@@ -22,33 +22,25 @@ from pipeline.core import DRPipeline
 from pipeline.utils.io_utils import read_csv_image_paths
 from pipeline.config.settings import IMAGE_DIR, CSV_PATH
 
-from pipeline.utils.clean_repo import clean_pipeline_outputs
-
-clean_pipeline_outputs()
-
-# === Load & filter CSV entries ===
-
 all_data = read_csv_image_paths(CSV_PATH)
 
-# Filter to just 2 images
+# filter
 test_data = [
     d for d in all_data
     if Path(d["image_path"]).name in ["0068_1.png"]
 ]
 
-# Add full path to image
 for item in test_data:
     item["image_path"] = IMAGE_DIR / item["image_path"]
 
-# === Construct pipeline ===
+# pipeline construction
 pipeline = DRPipeline([
     LoadImagePipe(),
     CLAHEGreenChannelPipe(),
     LesionMaskLoadingPipe(),
     PatchExtractionPipe(),
     LabelPatchesPipe(),
-    SavePatchesPipe()
+    SavePatchesPipe(multiprocessing=False)
 ])
 
-# === Run pipeline ===
 _ = pipeline.run(test_data) # assignable

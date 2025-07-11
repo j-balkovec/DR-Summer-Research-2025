@@ -12,7 +12,6 @@ sys.path.append(str(Path(__file__).resolve().parents[2]))
 
 from pipeline.utils.geometry_utils import polygon_from_mask, patch_center_to_polygon
 from pipeline.config.settings import (PATCH_HALF,
-                                      EXTRACT_FULL_PATCHES_ONLY,
                                       EXTRACT_ALL_PATCHES,
                                       LOG_ALL)
 from pipeline.utils.logger import get_logger
@@ -25,7 +24,7 @@ class PatchExtractionPipe:
     def process(self, data: dict) -> dict:
         # pre: data must contain "masks" and "enhanced_green" keys
         # post: data will contain the key "patches", a list of dicts with patch arrays and metadata
-        # desc: iterates over lesion masks, extracts centered patches; filters by size if toggle is enabled
+        # desc: iterates over lesion masks, extracts centered patches
 
         patches = []
         patch_counter = 1
@@ -45,12 +44,8 @@ class PatchExtractionPipe:
                 minx, miny, maxx, maxy = poly.bounds
                 cx, cy = int((minx + maxx) / 2), int((miny + maxy) / 2)
 
-                x_start, x_end = cx - PATCH_HALF, cx + PATCH_HALF + 1
-                y_start, y_end = cy - PATCH_HALF, cy + PATCH_HALF + 1
-
-                if EXTRACT_FULL_PATCHES_ONLY:
-                    if x_start < 0 or y_start < 0 or x_end > width or y_end > height:
-                        continue  # skip non-full patches
+                x_start, x_end = cx - PATCH_HALF, cx + PATCH_HALF
+                y_start, y_end = cy - PATCH_HALF, cy + PATCH_HALF
 
                 x_start = max(0, x_start)
                 y_start = max(0, y_start)
@@ -65,7 +60,6 @@ class PatchExtractionPipe:
                     "patch_no": int(patch_counter),
                     "x": cx,
                     "y": cy,
-                    "lesion_type": "lesion",
                     "patch_polygon": patch_poly
                 })
                 patch_counter += 1
@@ -83,13 +77,12 @@ class PatchExtractionPipe:
                 for x in range(PATCH_HALF, width - PATCH_HALF, 2 * PATCH_HALF):
                     patch_poly = patch_center_to_polygon(x, y, PATCH_HALF)
                     if not any(poly.intersects(patch_poly) for polys in lesion_polygons.values() for poly in polys):
-                        patch = image[y - PATCH_HALF:y + PATCH_HALF + 1, x - PATCH_HALF:x + PATCH_HALF + 1]
+                        patch = image[y - PATCH_HALF:y + PATCH_HALF, x - PATCH_HALF:x + PATCH_HALF]
                         patches.append({
                             "patch": patch,
                             "patch_no": int(patch_counter),
                             "x": x,
                             "y": y,
-                            "lesion_type": "healthy",
                             "patch_polygon": patch_poly
                         })
                         patch_counter += 1
