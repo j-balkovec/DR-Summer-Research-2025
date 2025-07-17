@@ -6,7 +6,6 @@
 
 from pathlib import Path
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 PIPELINE_DIR = Path(__file__).resolve().parent.parent
 IMAGE_DIR = BASE_DIR / "data" / "Seg-set" / "Original_Images"
@@ -14,12 +13,17 @@ MASK_ROOT = BASE_DIR / "data" / "Seg-set"
 
 # 1. brief: path to the CSV file containing image-level labels and segmentation metadata
 # 2. brief: root directory where extracted patch images will be saved
-# 3. brief: path to CSV metadata file for all extracted patches
-# 4. brief: path to pickled pandas DataFrame containing patch metadata (including image arrays, labels, etc.)
+# 3. brief: path to the master DataFrame that stores patch-level metadata
+# 4. brief: path to the master CSV file that stores image paths and metadata
 CSV_PATH = BASE_DIR / "data" / "Seg-set" / "DR_Seg_Grading_Label.csv" # 1
 PATCH_OUTPUT_DIR = BASE_DIR / "data" / "patches"                      # 2
-PATCHES_CSV = PATCH_OUTPUT_DIR / "csv" / "patch_metadata.csv"         # 3
-PATCHES_PICKLE = PATCH_OUTPUT_DIR / "frame" / "patch_frame.pkl"       # 4
+MASTER_PICKLE_DF_PATH = PATCH_OUTPUT_DIR / "master_df.pkl"            # 3
+MASTER_PATHS_CSV_PATH = PATCH_OUTPUT_DIR / "master_paths.csv"         # 4
+
+# 1. brief: path to the DataFrame that stores patch-level metadata
+# 2. brief: subdir name where the df is held
+TARGET_DF = "patch_frame.pkl"   # 1
+SUBDIR = "frame"                # 2
 
 # brief: path to a folder used for intermediate caching of pipeline results (unused as of right now)
 CACHE_DIR = PIPELINE_DIR / "cache"
@@ -39,9 +43,26 @@ LESION_MASKS = {
     'hemorrhages': 'Hemorrhage_Masks',
     'hard_exudates': 'HardExudate_Masks',
     'soft_exudates': 'SoftExudate_Masks',
-    'irma': 'IRMA_Masks',
-    'neovascularization': 'Neovascularization_Masks'
 }
+
+# brief: directory where visual check overlays will be saved
+VISUAL_CHECK_DIR = PATCH_OUTPUT_DIR / "visual_check"
+
+# brief: color map for lesion types used in visual checks
+# note: this is only used to color the lesion types in the visual check overlays
+COLOR_MAP = {
+    "microaneurysms": (0, 0, 255),     # Red (BGR)
+    "hemorrhages": (255, 0, 0),         # Blue
+    "hard_exudates": (0, 255, 255),    # Yellow
+    "soft_exudates": (0, 255, 0),      # Green
+}
+
+# brief: list of lesion types for easy access.
+# note: !dependency! -> @see LESION_MASKS
+#       this is used to iterate over lesion types in various parts of the pipeline
+#       and to ensure consistency with the mask loading process.
+#       it is also used to generate labels for patches in the labeling pipeline.
+LESION_LABELS = list(LESION_MASKS.keys())
 
 # 1. brief: maximum number of patches/images per shard (e.g. healthy_n has SHARD_DIR_LIMIT patches)
 # 2. brief: maximum number of healthy patches to retain in the final dataset (30k as of right now)

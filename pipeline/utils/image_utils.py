@@ -38,7 +38,6 @@ def normalize_image(image: np.ndarray) -> np.ndarray:
 
     return image.astype(np.float32) / 255.0
 
-
 # Pixel level, more rigid and harsh checks
 def count_black_pixels(patch, threshold=PATCH_BLACK_THRESHOLD):
     # pre: patch is a valid image patch (numpy array)

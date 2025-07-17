@@ -17,19 +17,31 @@ from pipeline.config.settings import LOG_ALL
 
 logger = get_logger(__name__, file_logging=True)
 
+# =============================================================
+# Deprecated: Image Preprocessing (for legacy reference only)
+# Jakob Balkovec | DR-Pipeline
+# =============================================================
+
 class CLAHEGreenChannelPipe:
     # brief: applies CLAHE enhancement to the green channel of fundus images
+
+    # -- DEPRECATED --
+    # Previous approach to extract the green channel from patches and apply CLAHE.
+    #
+    # Retained for historical reference.
 
     def process(self, data: dict) -> dict:
         # pre: data must contain the key "image" as a 3-channel RGB image
         # post: data will contain the key "enhanced_green" as a 2D numpy array
         # desc: extracts green channel and applies CLAHE for better lesion visibility
 
-        logger.info("extracting green channel") if LOG_ALL else None
-        green = extract_green_channel(data["image"])
+        raise DeprecationWarning("CLAHEGreenChannelPipe is deprecated.")
 
-        logger.info("applying CLAHE") if LOG_ALL else None
-        enhanced = apply_clahe(green)
+        # logger.info("extracting green channel") if LOG_ALL else None
+        # green = extract_green_channel(data["image"])
 
-        data["enhanced_green"] = enhanced
-        return data
+        # logger.info("applying CLAHE") if LOG_ALL else None
+        # enhanced = apply_clahe(green)
+
+        # data["enhanced_green"] = enhanced
+        # return data

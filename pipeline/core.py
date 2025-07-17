@@ -54,24 +54,23 @@ class DRPipeline:
 
         logger.info("[Main Line] Run complete") if LOG_ALL else None
 
-        # collect all patches into a dataframe
-        all_patches = []
-        for result in results:
-            all_patches.extend(result.get("patches", []))
+        # # collect all patches into a dataframe
+        # all_patches = []
+        # for result in results:
+        #     all_patches.extend(result.get("patches", []))
 
-        patch_df = pd.DataFrame(all_patches)
-        logger.info(f"[Main Line] Final patch dataframe shape: {patch_df.shape}") if LOG_ALL else None
+        # patch_df = pd.DataFrame(all_patches)
+        # logger.info(f"[Main Line] Final patch dataframe shape: {patch_df.shape}") if LOG_ALL else None
 
-        # store as attribute so it can be processed after running it
-        self.patch_df = patch_df
-        self.patch_df.drop(columns=['overlap_flag'], inplace=True)
+        # # store as attribute so it can be processed after running it
+        # self.patch_df = patch_df
 
-        batch_idx = results[0].get("batch_idx", None)
-        pickle_path = PATCHES_PICKLE if self.batch_idx is None else PATCHES_PICKLE.parent / f"patches_batch_{self.batch_idx}.pkl"
+        # batch_idx = results[0].get("batch_idx", None)
+        # pickle_path = PATCHES_PICKLE if self.batch_idx is None else PATCHES_PICKLE.parent / f"patches_batch_{self.batch_idx}.pkl"
 
-        ensure_dir(pickle_path.parent)
-        patch_df.to_pickle(pickle_path)
-        if LOG_ALL:
-            logger.info(f"saved patch dataframe to {pickle_path}")
+        # ensure_dir(pickle_path.parent)
+        # patch_df.to_pickle(pickle_path)
+        # if LOG_ALL:
+        #     logger.info(f"saved patch dataframe to {pickle_path}")
 
-        return results
+        # return results

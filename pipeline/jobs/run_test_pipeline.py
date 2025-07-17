@@ -24,23 +24,24 @@ from pipeline.config.settings import IMAGE_DIR, CSV_PATH
 
 all_data = read_csv_image_paths(CSV_PATH)
 
-# filter
+# Filter test subset
 test_data = [
     d for d in all_data
-    if Path(d["image_path"]).name in ["0068_1.png"]
+    if Path(d["image_path"]).name in ["0068_1.png", "0058_1.png"]
 ]
 
+# Add full path to each
 for item in test_data:
     item["image_path"] = IMAGE_DIR / item["image_path"]
 
-# pipeline construction
+# Define pipeline
 pipeline = DRPipeline([
-    LoadImagePipe(),
-    CLAHEGreenChannelPipe(),
+    LoadImagePipe(),               # now loads to "rgb_image"
     LesionMaskLoadingPipe(),
     PatchExtractionPipe(),
     LabelPatchesPipe(),
-    SavePatchesPipe(multiprocessing=False)
+    SavePatchesPipe()
 ])
 
-_ = pipeline.run(test_data) # assignable
+# Run test
+_ = pipeline.run(test_data)  # assignable for inspection

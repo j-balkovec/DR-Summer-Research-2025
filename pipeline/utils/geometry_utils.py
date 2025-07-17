@@ -55,3 +55,15 @@ def translate_polygon(polygon: Polygon, dx: float, dy: float) -> Polygon:
     # desc: translates the polygon by the specified offsets
 
     return translate(polygon, xoff=dx, yoff=dy)
+
+def get_patch_coordinates(x, y, size):
+    # pre: x, y are the center coordinates of the patch, size is the size of the patch
+    # post: returns a dictionary with the coordinates of the four corners of the patch
+    # desc: calculates the coordinates of the four corners of a square patch centered at (x, y)
+
+    return {
+        "top-left": (x, y),
+        "top-right": (x + size - 1, y),
+        "bottom-left": (x, y + size - 1),
+        "bottom-right": (x + size - 1, y + size - 1),
+    }

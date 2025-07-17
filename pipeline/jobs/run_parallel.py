@@ -89,11 +89,10 @@ def run_pipeline_batch(batch_idx, batch_size=BATCH_SIZE):
     pipeline = DRPipeline(
         pipes=[
             LoadImagePipe(),
-            CLAHEGreenChannelPipe(),
             LesionMaskLoadingPipe(),
             PatchExtractionPipe(),
             LabelPatchesPipe(),
-            SavePatchesPipe(multiprocessing=True, batch_idx=batch_idx),
+            SavePatchesPipe(),
         ],
         batch_idx=batch_idx)
 
@@ -112,7 +111,7 @@ def run_pipeline_in_parallel(batch_size=BATCH_SIZE):
     # desc: divides the dataset into batches and processes each batch in parallel
     #       using the cpu_count/2 number of workers
 
-    num_workers = os.cpu_count() // 2 # floor div by 2...use only half the cores
+    num_workers = max(1, os.cpu_count() // 2) # floor div by 2...use only half the cores
 
     all_data = load_and_prepare_metadata()
     num_batches = (len(all_data) + batch_size - 1) // batch_size

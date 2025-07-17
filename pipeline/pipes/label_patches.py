@@ -13,16 +13,8 @@ sys.path.append(str(Path(__file__).resolve().parents[2]))
 
 import numpy as np
 
-from pipeline.config.settings import (PATCH_HALF,
-                                      LOG_ALL,
-                                      BLACK_PIXELS_THRESHOLD)
-
+from pipeline.config.settings import (PATCH_SIZE, LOG_ALL, LESION_LABELS)
 from pipeline.utils.logger import get_logger
-
-from pipeline.utils.geometry_utils import (polygon_from_mask,
-                                           patch_center_to_polygon)
-
-from pipeline.utils.image_utils import count_black_pixels
 
 logger = get_logger(__name__, file_logging=True)
 
@@ -36,73 +28,47 @@ class LabelPatchesPipe:
 
     def process(self, data: dict) -> dict:
         # pre: data must contain "patches" and "masks"
-        # post: each patch will contain "label_vector", "label", "lesion_shape", "overlap_flag"
-        # desc: assigns multi-label binary vector by checking lesion polygon intersection
+        # post: each patch will contain "label_vector" with binary labels for each lesion type
+        # desc: assigns label vector based on lesion mask presence in the patch crop
 
         masks = data.get("masks", {})
         patches = data.get("patches", [])
-
-        lesion_types = [
-            'microaneurysms',
-            'hemorrhages',
-            'hard_exudates',
-            'soft_exudates',
-            'irma',
-            'neovascularization'
-        ]
-
-        lesion_polygons = {
-            lesion_type: polygon_from_mask(masks.get(lesion_type))
-            for lesion_type in lesion_types
-            if masks.get(lesion_type) is not None
-        }
+        image_id = Path(data["image_path"]).stem
 
         for patch in patches:
             cx, cy = patch["x"], patch["y"]
-            patch_img = patch.get("patch")
-            patch_poly = patch_center_to_polygon(cx, cy, PATCH_HALF)
+            label_vector = []
 
-            label_vector = {lt: 0 for lt in lesion_types}
-            lesion_shapes = {}
-            overlap_count = 0
+            for lesion_type in LESION_LABELS:
+                mask = masks.get(lesion_type)
 
-            if patch.get("label", None) == "healthy":  # fallback logic for healthy patches
-                if patch_img is None:
-                    raise ValueError(f"patch image is 'None' for patch ({cx}, {cy}) with id: {[patch['patch_no']]}, image_id: {patch.get('image_id')}")
-                black_pixels = count_black_pixels(patch_img)
+                if mask is None:
+                    logger.warning(f"mask not found {image_id}, {lesion_type}")
+                    label_vector.append(0)
+                    continue
 
-                if black_pixels >= BLACK_PIXELS_THRESHOLD:
-                    patch["label"] = "black"
-                else:
-                    patch["label"] = "healthy"
-
-                patch["lesion_shape"] = None
-                patch["overlap_flag"] = False
-            else:
-                for lesion_type, polygons in lesion_polygons.items():
-                    for poly in polygons:
-                        if poly.is_valid and poly.intersects(patch_poly):
-                            label_vector[lesion_type] = 1
-                            inter = patch_poly.intersection(poly)
-                            if inter.area > 0:
-                                lesion_shapes.setdefault(lesion_type, []).append(inter)
-                                overlap_count += 1
-
-                patch["label"] = "lesion" if sum(label_vector.values()) > 0 else "healthy"
-                patch["lesion_shape"] = lesion_shapes if lesion_shapes else None
-                patch["overlap_flag"] = overlap_count > 1
-
-            lesion_tags = [lt for lt, val in label_vector.items() if val == 1]
-            lesion_suffix = "_".join(sorted(lesion_tags)) if lesion_tags else "healthy"
+                y0, y1 = cy - PATCH_SIZE // 2, cy + PATCH_SIZE // 2
+                x0, x1 = cx - PATCH_SIZE // 2, cx + PATCH_SIZE // 2
+                lesion_crop = mask[y0:y1, x0:x1]
+                label = int(np.any(lesion_crop > 0))
+                label_vector.append(label)
 
             patch["label_vector"] = label_vector
-            patch["image_id"] = Path(data["image_path"]).stem
-            patch["file_name"] = f"{patch['image_id']}_{lesion_suffix}_{cx}_{cy}.png"
 
-        logger.info(f"labeled {len(patches)} patches with multi-label vectors") if LOG_ALL else None
+            if patch["filter_tag"] != "black":
+                patch["filter_tag"] = (
+                    "healthy" if label_vector == [0, 0, 0, 0] else "lesion"
+                )
+
+            lesion_suffix = "_".join([
+                lesion for lesion, present in zip(LESION_LABELS, label_vector) if present
+            ]) or "healthy"
+
+            patch["image_id"] = image_id
+            patch["file_name"] = f"{image_id}_{lesion_suffix}_{cx}_{cy}.png"
+
+        logger.info(f"labeled {len(patches)} patches for image {image_id}") if LOG_ALL else None
         return data
-
-
 
 
     # =============================================================
@@ -121,7 +87,7 @@ class LabelPatchesPipe:
         # post: each patch will contain "label", "lesion_shape", and "overlap_flag"
         # desc: assigns lesion labels based on the largest area of intersection with each patch
 
-        raise NotImplementedError("This method is deprecated and should not be used.")
+        raise DeprecationWarning("This method is deprecated and should not be used.")
 
         # Uncomment below if reactivation is needed:
 
