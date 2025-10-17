@@ -1,0 +1,1 @@
+This repository contains research work focused on Diabetic Retinopathy lesion segmentation. It explores hybrid, image-based, and patch-based approaches to improve segmentation accuracy. The project aims to advance automated analysis techniques for diabetic retinopathy diagnosis and treatment planning.
