@@ -34,7 +34,7 @@ def get_logger(name=__name__, file_logging=True) -> logging.Logger:
         ch.setLevel(logging.INFO)
         ch_formatter = logging.Formatter("[%(levelname)s] %(message)s")
         ch.setFormatter(ch_formatter)
-        logger.addHandler(ch)
+        # logger.addHandler(ch) # commenting out console logging for cleaner output
 
         # file
         if file_logging:

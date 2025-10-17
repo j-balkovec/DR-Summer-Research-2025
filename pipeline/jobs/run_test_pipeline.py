@@ -27,7 +27,7 @@ all_data = read_csv_image_paths(CSV_PATH)
 # Filter test subset
 test_data = [
     d for d in all_data
-    if Path(d["image_path"]).name in ["0068_1.png", "0058_1.png"]
+    if Path(d["image_path"]).name in ["0013_1.png", "0000_1.png"]
 ]
 
 # Add full path to each

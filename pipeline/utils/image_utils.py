@@ -52,13 +52,18 @@ def count_black_pixels(patch, threshold=PATCH_BLACK_THRESHOLD):
     return 0
 
 # Looser check, more flexible
-def is_mostly_black(patch, threshold=PATCH_BLACK_THRESHOLD, black_ratio=BLACK_RATIO):
-    # pre: patch is a valid image patch (numpy array)
-    # post: returns True if the patch is mostly black, False otherwise
-    # desc: checks if the patch has a high ratio of black pixels
-    arr = np.array(patch)
-    if arr.ndim == 3:
+def is_mostly_black(patch, threshold: int = PATCH_BLACK_THRESHOLD, black_ratio: float = BLACK_RATIO) -> bool:
+    if patch is None or not isinstance(patch, np.ndarray) or patch.size == 0:
+        return True  # treat invalid patch as unusable/black
+
+    arr = patch.astype(np.float32, copy=False)
+
+    # If RGB, average channels
+    if arr.ndim == 3 and arr.shape[2] >= 3:
         arr = arr.mean(axis=2)
-    black_pixels = np.sum(arr < threshold)
-    return (black_pixels / arr.size) > black_ratio
+
+    black_pixels = int((arr < threshold).sum())
+    ratio = black_pixels / float(arr.size)
+
+    return ratio > black_ratio
 

@@ -16,7 +16,7 @@ import pandas as pd
 
 from pipeline.utils.logger import get_logger
 from pipeline.utils.io_utils import ensure_dir
-from pipeline.config.settings import LOG_ALL, PATCHES_PICKLE, DISABLE_TQDM
+from pipeline.config.settings import LOG_ALL, DISABLE_TQDM
 from pipeline.utils.io_utils import tqdm_if_verbose
 
 logger = get_logger(__name__, file_logging=True)

@@ -5,6 +5,7 @@
 # brief: centralized configuration for paths, patch sizes, constants, and pipeline settings
 
 from pathlib import Path
+import math
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 PIPELINE_DIR = Path(__file__).resolve().parent.parent
@@ -31,6 +32,16 @@ CACHE_DIR = PIPELINE_DIR / "cache"
 PATCH_SIZE = 128                    # 128 x 128 -> 100 pathches per image
 PATCH_HALF = PATCH_SIZE // 2
 IMAGE_SHAPE = (1280, 1280)
+HEALTHY_TO_LESION_RATIO = 1.5       # 60/40 -> 1.5
+
+# 1. brief: margin in pixles to avoid sampling too close to lesions
+# 2. brief: keep centers inside the FOV if provided
+# 3. brief: exclude optic disc area when sampling healthy patches
+# 4. brief: random seed for reproducibility
+LESION_DILATE_PX = 6                # 1
+FOV_REQUIRED = True                 # 2
+AVOID_OPTIC_DISC = True             # 3
+SEED = 1337                         # 4
 
 # 1. brief: if True, skips partial patches at the borders and retains only fully enclosed 25x25 crops
 # 2. brief: if True, extracts both symptomatic (lesion-centered) and healthy (non-lesion) patches
@@ -75,8 +86,8 @@ BLACK_PATCHES_LIMIT = 2000      # 3
 # 2. brief: ratio of black pixels in a patch to consider it mostly black
 # 3. brief: minimum number of black pixels in a patch to consider it mostly black
 PATCH_BLACK_THRESHOLD = 10     # 1
-BLACK_RATIO = 0.95             # 2
-BLACK_PIXELS_THRESHOLD = 14418 # 3 0.88 * patch_size^2 (128 * 128 = 16384)
+BLACK_RATIO = 0.90             # 2
+BLACK_PIXELS_THRESHOLD = BLACK_RATIO * pow(PATCH_SIZE, 2) # 3 0.88 * patch_size^2 (128 * 128 = 16384)
 
 # brief: if False, tqdm bar behaves as normal, else it's turned [OFF]
 DISABLE_TQDM = False # default behavior
@@ -93,7 +104,7 @@ BATCH_SIZE = 100
 # brief: maximum number of healthy patches to retain in each batch when running in parallel
 # note: this is used to limit the number of healthy patches processed in each parallel batch
 #       to avoid overwhelming the system with too many healthy patches at once + I don't want to rewrite my pipe
-HEALTHY_PATCHES_LIMIT_MP = HEALTHY_PATCHES_LIMIT // BATCH_SIZE  # for multiprocessin
+HEALTHY_PATCHES_LIMIT_MP = HEALTHY_PATCHES_LIMIT // BATCH_SIZE  # for multiprocessing
 
 # ===== logging =====
 

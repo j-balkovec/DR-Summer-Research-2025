@@ -10,11 +10,9 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 # == sys path ==
 
-import os
 import pandas as pd
-import cv2
 
-from pipeline.config.settings import LOG_ALL, PATCH_OUTPUT_DIR, PATCHES_PICKLE
+from pipeline.config.settings import LOG_ALL, PATCH_OUTPUT_DIR
 from pipeline.utils.logger import get_logger
 from pipeline.utils.io_utils import ensure_dir
 
