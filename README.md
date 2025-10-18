@@ -1,3 +1,7 @@
+![Python](https://img.shields.io/badge/python-3.10-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Status](https://img.shields.io/badge/status-active-brightgreen)
+
 # Project Directory Overview
 
 This document provides an overview of the project directory structure and some important notes to help you navigate and use the resources effectively.
