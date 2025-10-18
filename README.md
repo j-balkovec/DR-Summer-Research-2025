@@ -123,6 +123,6 @@ Feel free to explore the directories and modify files as needed to suit your ana
 
 If you have any questions or need further assistance, please don't hesitate to reach out to your professor or us.
 
-**Jakob Balkovec**: jakob.balkovec@gmail.com
-**Daniel Kirov-Tomilov**:
-**Alyssa Abogado**:
+**Jakob Balkovec**: jakob.balkovec@gmail.com <br>
+**Daniel Kirov-Tomilov**: <br>
+**Alyssa Abogado**: <br>
