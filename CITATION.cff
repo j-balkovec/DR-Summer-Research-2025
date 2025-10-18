@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "If you use this repository, please cite it as below."
 title: "Hybrid-Based Diabetic Retinopathy Lesion Segmentation Framework"
 authors:
-  - family-names: Li
-    given-names: Lin
+  - family-names: Balkovec
+    given-names: Jakob
     affiliation: "Seattle University, Department of Computer Science"
   - family-names: Daniel
     given-names: Kirov-Tomilov
@@ -11,9 +11,10 @@ authors:
   - family-names: Abogado
     given-names: Alyssa
     affiliation: "Seattle University, Department of Computer Science"
-  - family-names: Balkovec
-    given-names: Jakob
+  - family-names: Li
+    given-names: Lin
     affiliation: "Seattle University, Department of Computer Science"
+
 date-released: 2025-10-15
 version: "1.0.0"
 doi: insert_doi_here_when_publication_gets_released
